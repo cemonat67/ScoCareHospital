@@ -73,6 +73,60 @@
     .space{height:4px}
     .print-hide{@media print{display:none !important}}
     .print-only{display:none}@media print{.print-only{display:block}}
+    /* Scrollable container for High-Risk Alerts table */
+    .scrolly{
+      max-height: 320px;
+      overflow: auto;
+    }
+    @media (max-height: 780px){
+      .scrolly{ max-height: 240px; }
+    }
+  
+/* Keep AI Alerts (High Risk) Risk column on a single line and make it wider */
+#alertTable td:nth-child(4),
+#th_risk{
+  white-space: nowrap;
+  min-width: 140px;
+}
+
+  
+/* Force Risk badge to stay on one line horizontally */
+#alertTable td:nth-child(4) .badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  padding: 4px 10px;
+}
+
+  
+/* Force AI Alerts Risk badge to render inline without wrapping */
+#alertTable td:nth-child(4) .badge,
+#patientTable td:nth-child(4) .badge,
+#bedTable td:nth-child(5) .badge {
+  display: inline-block !important;
+  white-space: nowrap !important;
+  min-width: 110px;
+  text-align: center;
+}
+
+  
+/* Keep all risk badges single-line everywhere */
+.badge{ 
+  white-space: nowrap; 
+  display: inline-flex; 
+  align-items: center; 
+  gap: 6px;
+}
+
+/* Make Risk columns a bit wider across all tables */
+#alertTable td:nth-child(4), #alertTable th:nth-child(4),
+#patientTable td:nth-child(4), #patientTable th:nth-child(4),
+#dischargeTable td:nth-child(5), #dischargeTable th:nth-child(5),
+#bedTable td:nth-child(5), #bedTable th:nth-child(5){
+  min-width: 150px;
+}
+
   </style>
 </head>
 <body>
@@ -134,7 +188,7 @@
           <div class="section-title" id="ai_alerts_title">AI Uyarıları (Yüksek Risk)</div>
           <div class="muted" id="ai_alerts_desc" style="margin-bottom:8px">Risk sınıfı “Action” olan ilk 10</div>
           <div class="space"></div>
-          <div style="overflow:auto">
+          <div class="scrolly">
             <table>
               <thead>
                 <tr>
@@ -548,6 +602,7 @@
       document.getElementById("btnClear").textContent = t("btnClear");
       document.getElementById("search").placeholder = t("search_ph");
       renderAll();
+      ensureHighOcc();
     }
 
     // --- Routing (hash tabs) ---
@@ -744,6 +799,7 @@
     function removePatient(id){
       const pts = getPatients().filter(p=>p.id!==id);
       savePatients(pts); renderAll();
+      ensureHighOcc();
     }
     function prefill(id){
       const p = getPatients().find(x=>x.id===id); if(!p) return;
@@ -759,7 +815,7 @@
     }
     function setVal(id,v,isTextArea=false){ const el=document.getElementById(id); if(!el) return; el.value=v; }
 
-    // --- Seed Data (3 hastane, 30 hasta) ---
+    // --- Seed Data (3 hastane, 30+20 hasta) ---
     function seed(){
       const demo = [
         // Ege Üniversitesi Hastanesi — Kardiyoloji
@@ -1011,12 +1067,128 @@
           symptoms:"Eforla göğüs ağrısı, yorgunluk, hafif ödem"
         }
       ];
+
+      // ---- 20 EK HASTA (10 OK + 10 Action) ----
+      const hospList = [
+        "Ege Üniversitesi Hastanesi",
+        "Dokuz Eylül Üniversitesi Hastanesi",
+        "Yeşilyurt Eğitim ve Araştırma Hastanesi"
+      ];
+      const extra = [];
+
+      // 10 düşük risk (OK) + LOS≥2 + hospitalized
+      for(let i=1;i<=10;i++){
+        extra.push({
+          id: rid(), name: `OK Demo ${i}`, gender: i%2? "Erkek":"Kadın", age: 45 + (i%30),
+          hospital: hospList[i%3], department: "Dahiliye",
+          status: "hospitalized", losDays: 2 + (i%4), enrolled: false, readmission: false,
+          vitals: { hr: 78, spo2: 97, sys: 125, dia: 78, glucose: 95, adherence: 95 },
+          symptoms: ""
+        });
+      }
+
+      // 10 yüksek risk (Action) + hospitalized
+      for(let i=1;i<=10;i++){
+        extra.push({
+          id: rid(), name: `HR Demo ${i}`, gender: i%2? "Kadın":"Erkek", age: 55 + (i%25),
+          hospital: hospList[(i+1)%3], department: "Kardiyoloji",
+          status: "hospitalized", losDays: 1 + (i%3), enrolled: false, readmission: (i%3===0),
+          vitals: { hr: 115, spo2: 88, sys: 165, dia: 102, glucose: 180, adherence: 50 },
+          symptoms: "Göğüs ağrısı, nefes darlığı, ateş"
+        });
+      }
+
+      // Ana listeye ekle
+      demo.push(...extra);
+
       savePatients(demo);
-      const s = getSettings();
-      s.riskLow = 30; s.riskHigh = 60;
-      s.beds = structuredClone(defaults.beds);
-      saveSettings(s);
+
+      // --- Dinamik yatak sayıları: toplam doluluk > %90 hedefle ---
+      const allPts = demo; // yeni kaydedilenler dahil
+      const inpatients = allPts.filter(p => p.status === "hospitalized");
+
+      // Hedef toplam yatak = inpatients / 0.92 (yaklaşık %92 doluluk)
+      const totalBedsTarget = Math.max( Math.ceil(inpatients.length / 0.92), inpatients.length );
+
+      const hospListDyn = [
+        "Ege Üniversitesi Hastanesi",
+        "Dokuz Eylül Üniversitesi Hastanesi",
+        "Yeşilyurt Eğitim ve Araştırma Hastanesi"
+      ];
+      const countsPerHosp = hospListDyn.map(h => inpatients.filter(p => p.hospital === h).length);
+      const sumCounts = countsPerHosp.reduce((a,b)=>a+b,0) || 1;
+
+      // Oransal dağıtım + en az 1 yatak
+      let provisional = countsPerHosp.map(c => Math.max(1, Math.round(totalBedsTarget * (c / sumCounts))));
+
+      // Yuvarlama hatasını telafi et
+      let diff = totalBedsTarget - provisional.reduce((a,b)=>a+b,0);
+      for(let i=0; diff!==0 && i<100; i++){
+        const idx = i % provisional.length;
+        provisional[idx] += (diff>0? 1 : -1);
+        diff = totalBedsTarget - provisional.reduce((a,b)=>a+b,0);
+      }
+
+      // Ayarları çek, yaz ve kaydet
+      const sDyn = getSettings();
+      sDyn.riskLow = 30; 
+      sDyn.riskHigh = 60;
+      sDyn.beds = {
+        [hospListDyn[0]]: provisional[0],
+        [hospListDyn[1]]: provisional[1],
+        [hospListDyn[2]]: provisional[2],
+      };
+      saveSettings(sDyn);
       renderAll();
+      ensureHighOcc();
+    }
+
+    
+    // --- Ensure occupancy >= 90% by adjusting bed counts proportionally ---
+    function ensureHighOcc(target=0.92){
+      const pts = getPatients();
+      const inpatients = pts.filter(p=>p.status==="hospitalized");
+      if(inpatients.length===0) return;
+
+      const s0 = getSettings();
+      const totalBedsNow = Object.values(s0.beds).reduce((a,b)=>a+b,0) || 0;
+      const occNow = totalBedsNow ? (inpatients.length/totalBedsNow) : 0;
+
+      // Avoid infinite loops; adjust only once per session if below 90% or way above 95%
+      if(occNow >= 0.90 && occNow <= 0.95) return;
+      if(sessionStorage.getItem("scoAdjusted") === "1") return;
+
+      const hospListDyn = [
+        "Ege Üniversitesi Hastanesi",
+        "Dokuz Eylül Üniversitesi Hastanesi",
+        "Yeşilyurt Eğitim ve Araştırma Hastanesi"
+      ];
+
+      // Aim for ~92% occupancy
+      const totalBedsTarget = Math.max( Math.ceil(inpatients.length / target), inpatients.length );
+
+      const countsPerHosp = hospListDyn.map(h => inpatients.filter(p => p.hospital === h).length);
+      const sumCounts = countsPerHosp.reduce((a,b)=>a+b,0) || 1;
+
+      let provisional = countsPerHosp.map(c => Math.max(1, Math.round(totalBedsTarget * (c / sumCounts))));
+
+      let diff = totalBedsTarget - provisional.reduce((a,b)=>a+b,0);
+      for(let i=0; diff!==0 && i<100; i++){
+        const idx = i % provisional.length;
+        provisional[idx] += (diff>0? 1 : -1);
+        diff = totalBedsTarget - provisional.reduce((a,b)=>a+b,0);
+      }
+
+      const sDyn = getSettings();
+      sDyn.beds = {
+        [hospListDyn[0]]: provisional[0],
+        [hospListDyn[1]]: provisional[1],
+        [hospListDyn[2]]: provisional[2],
+      };
+      saveSettings(sDyn);
+      sessionStorage.setItem("scoAdjusted", "1");
+      renderAll();
+      ensureHighOcc();
     }
 
     // --- CSV Export ---
@@ -1096,6 +1268,7 @@
       s.riskLow = Number(document.getElementById("s_low").value || defaults.riskLow);
       s.riskHigh = Number(document.getElementById("s_high").value || defaults.riskHigh);
       saveSettings(s); renderAll();
+      ensureHighOcc();
     });
     document.getElementById("btnSaveBeds").addEventListener("click", ()=>{
       const s = getSettings();
@@ -1105,6 +1278,7 @@
         "Yeşilyurt Eğitim ve Araştırma Hastanesi": Number(document.getElementById("b_yesil").value || defaults.beds["Yeşilyurt Eğitim ve Araştırma Hastanesi"]),
       };
       saveSettings(s); renderAll();
+      ensureHighOcc();
     });
 
     document.getElementById("btnCompute").addEventListener("click", ()=>{
@@ -1137,13 +1311,13 @@
         v.adherence = clamp((v.adherence||90) + randRange(-20,10), 0, 100);
       }
       savePatients(pts); renderAll();
+      ensureHighOcc();
     });
 
     // --- Init ---
     (function init(){
       setLang("tr");
       route();
-      // otomatik seed: cihazda veri yoksa
       if(!localStorage.getItem(LS_SEEDED)){
         seed();
         localStorage.setItem(LS_SEEDED, "1");
@@ -1151,8 +1325,8 @@
         const pts = getPatients();
         if(!pts || pts.length===0){ seed(); }
         else { renderAll(); }
+      ensureHighOcc();
       }
-      // settings UI doldur
       const s = getSettings();
       document.getElementById("s_low").value = s.riskLow;
       document.getElementById("s_high").value = s.riskHigh;
