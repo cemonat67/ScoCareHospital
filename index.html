@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="dark" data-lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SCO Care — İzmir Pilot MVP (TR/EN)</title>
+  <style>
+    :root{
+      --bg:#0f1221; --card:#141834; --soft:#1b2145; --text:#eef2ff; --muted:#a8b0d6;
+      --accent:#f9ba00; --ok:#00c389; --warn:#ffb020; --alert:#D51635; --border:#2a3369;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
+      font:500 15px/1.55 "Inter",system-ui,-apple-system,Segoe UI,Roboto,Arial}
+    a{color:var(--accent);text-decoration:none}
+    .container{max-width:1240px;margin:18px auto;padding:0 16px}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:10px;flex-wrap:wrap}
+    .logo{display:flex;gap:10px;align-items:center}
+    .logo-badge{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#0b2466,#1f5bd6);
+      display:grid;place-items:center;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+    .logo-badge span{font-weight:900;color:#fff}
+    h1{font-size:20px;margin:0}
+    .sub{color:var(--muted);font-size:13px;margin-top:2px}
+    .nav{display:flex;gap:8px;flex-wrap:wrap}
+    .tab-link{border:1px solid var(--border);background:transparent;color:var(--text);
+      padding:10px 14px;border-radius:10px;cursor:pointer;display:inline-block}
+    .tab-link.active{background:var(--soft);border-color:#3a468b}
+    .lang{display:flex;gap:6px;align-items:center}
+    .lang button{border:1px solid var(--border);background:transparent;color:#fff;
+      padding:8px 10px;border-radius:999px;cursor:pointer}
+    .lang button.active{background:var(--soft)}
+    .grid{display:grid;gap:14px}
+    .kpis{grid-template-columns:repeat(4,minmax(0,1fr))}
+    @media (max-width:980px){.kpis{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:560px){.kpis{grid-template-columns:1fr}}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px}
+    .kpi{display:flex;flex-direction:column;gap:8px}
+    .kpi .title{color:var(--muted);font-size:12px}
+    .kpi .value{font-size:24px;font-weight:800}
+    .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:12px;
+      border:1px solid var(--border);background:var(--soft)}
+    .row{display:flex;gap:14px;flex-wrap:wrap}
+    .col{flex:1 1 360px}
+    .section-title{font-weight:800;margin:0 0 8px 0;font-size:16px}
+    .muted{color:var(--muted)}
+    .bar{height:10px;border-radius:999px;background:#1a2250;overflow:hidden;border:1px solid var(--border)}
+    .bar > i{display:block;height:100%;background:linear-gradient(90deg,#3356ff,#7fa3ff)}
+    table{width:100%;border-collapse:separate;border-spacing:0 8px}
+    th,td{padding:10px 12px;font-size:14px;text-align:left}
+    thead th{color:var(--muted);font-weight:700}
+    tbody tr{background:var(--soft);border:1px solid var(--border)}
+    tbody tr td:first-child{border-top-left-radius:10px;border-bottom-left-radius:10px}
+    tbody tr td:last-child{border-top-right-radius:10px;border-bottom-right-radius:10px}
+    .badge{padding:4px 8px;border-radius:8px;font-size:12px;border:1px solid var(--border);background:#0f1a4a}
+    .badge.ok{background:rgba(0,195,137,.12);border-color:rgba(0,195,137,.35);color:#b5ffe9}
+    .badge.mon{background:rgba(255,176,32,.12);border-color:rgba(255,176,32,.35);color:#ffe4b3}
+    .badge.act{background:rgba(213,22,53,.12);border-color:rgba(213,22,53,.35);color:#ffc0cc}
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap}
+    .btn{background:linear-gradient(180deg,#ffc64d,#f9ba00);color:#231a00;border:none;padding:10px 12px;border-radius:10px;cursor:pointer;font-weight:800}
+    .btn.secondary{background:transparent;color:var(--text);border:1px solid var(--border)}
+    .btn.ghost{background:transparent;color:var(--muted)}
+    input,select,textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:#0e173f;color:#fff}
+    label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px}
+    .grid2{display:grid;gap:12px;grid-template-columns:repeat(2,1fr)}
+    @media (max-width:700px){.grid2{grid-template-columns:1fr}}
+    .mobile-frame{width:360px;max-width:100%;border:1px solid var(--border);border-radius:18px;overflow:hidden;background:#0b1440}
+    .mf-header{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+    .mf-body{padding:14px}
+    .mf-title{font-weight:800}
+    .footnote{font-size:12px;color:var(--muted)}
+    .right{justify-content:flex-end}
+    .flex{display:flex;gap:10px;align-items:center}
+    .space{height:4px}
+    .print-hide{@media print{display:none !important}}
+    .print-only{display:none}@media print{.print-only{display:block}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="print-hide">
+      <div class="logo">
+        <div class="logo-badge"><span>SCO</span></div>
+        <div>
+          <h1 id="app_title">SCO Care — İzmir Pilot MVP</h1>
+          <div class="sub" id="subtitle">Ege Üniversitesi • Dokuz Eylül Üniversitesi • Yeşilyurt EAH — AI tabanlı Evde Bakım + Yatış Optimizasyonu</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="#dashboard" class="tab-link active" id="tab_dashboard_btn">Dashboard</a>
+        <a href="#patient" class="tab-link" id="tab_patient_btn">Hasta Uygulaması</a>
+        <a href="#beds" class="tab-link" id="tab_beds_btn">Yatak Yönetimi</a>
+        <a href="#settings" class="tab-link" id="tab_settings_btn">Ayarlar</a>
+        <a href="#data" class="tab-link" id="tab_data_btn">Veri</a>
+      </nav>
+      <div class="lang">
+        <span class="muted" id="lang_label">Dil</span>
+        <button id="btn_tr" class="active">TR</button>
+        <button id="btn_en">EN</button>
+      </div>
+    </header>
+
+    <!-- DASHBOARD -->
+    <section id="tab-dashboard" class="tab">
+      <div class="grid kpis">
+        <div class="card kpi">
+          <div class="title" id="kpi_occ_title">Toplam Yatak Doluluk</div>
+          <div class="value" id="kpiOcc">—</div>
+          <div class="muted" id="kpiOccSub">—</div>
+        </div>
+        <div class="card kpi">
+          <div class="title" id="kpi_los_title">Ortalama Yatış Süresi (LOS)</div>
+          <div class="value" id="kpiLOS">—</div>
+          <div class="muted" id="kpi_los_desc">Güncel yatan hastalar ortalaması</div>
+        </div>
+        <div class="card kpi">
+          <div class="title" id="kpi_readmit_title">Yeniden Yatış Oranı</div>
+          <div class="value" id="kpiReadmit">—</div>
+          <div class="muted" id="kpi_readmit_desc">Son kayıtlar</div>
+        </div>
+        <div class="card kpi">
+          <div class="title" id="kpi_home_title">Evde İzlenen Hasta</div>
+          <div class="value" id="kpiHome">—</div>
+          <div class="muted" id="kpi_home_desc">Uzaktan takip (tele-sağlık) aktif</div>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:14px">
+        <div class="col card">
+          <div class="section-title" id="hosp_occ_title">Hastane Bazlı Doluluk</div>
+          <div class="muted" id="hosp_occ_desc" style="margin-bottom:8px">Yatan hasta / toplam yatak</div>
+          <div id="hospBars"></div>
+        </div>
+        <div class="col card">
+          <div class="section-title" id="ai_alerts_title">AI Uyarıları (Yüksek Risk)</div>
+          <div class="muted" id="ai_alerts_desc" style="margin-bottom:8px">Risk sınıfı “Action” olan ilk 10</div>
+          <div class="space"></div>
+          <div style="overflow:auto">
+            <table>
+              <thead>
+                <tr>
+                  <th id="th_patient">Hasta</th>
+                  <th id="th_hospital">Hastane</th>
+                  <th id="th_dept">Klinik</th>
+                  <th id="th_risk">Risk</th>
+                  <th id="th_status">Durum</th>
+                </tr>
+              </thead>
+              <tbody id="alertTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <div class="section-title" id="discharge_title">AI Taburculuk Önerileri</div>
+        <div class="muted" id="discharge_desc" style="margin-bottom:8px">Düşük risk + 2+ gün yatan hastalar</div>
+        <div class="space"></div>
+        <div style="overflow:auto">
+          <table>
+            <thead>
+              <tr>
+                <th id="th_patient2">Hasta</th>
+                <th id="th_hospital2">Hastane</th>
+                <th id="th_dept2">Klinik</th>
+                <th id="th_los">LOS (gün)</th>
+                <th id="th_risk2">Risk</th>
+                <th id="th_suggestion">Öneri</th>
+              </tr>
+            </thead>
+            <tbody id="dischargeTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- PATIENT APP -->
+    <section id="tab-patient" class="tab" style="display:none">
+      <div class="row">
+        <div class="col">
+          <div class="mobile-frame">
+            <div class="mf-header">
+              <div class="mf-title" id="mobile_title">SCO Care — Hasta</div>
+              <div class="pill" id="mobile_badge">Mobil</div>
+            </div>
+            <div class="mf-body">
+              <div class="grid2">
+                <div>
+                  <label id="lbl_name">Ad Soyad</label>
+                  <input id="p_name" placeholder="Örn. Ayşe Yılmaz">
+                </div>
+                <div>
+                  <label id="lbl_hospital">Hastane</label>
+                  <select id="p_hospital">
+                    <option>Ege Üniversitesi Hastanesi</option>
+                    <option>Dokuz Eylül Üniversitesi Hastanesi</option>
+                    <option>Yeşilyurt Eğitim ve Araştırma Hastanesi</option>
+                  </select>
+                </div>
+                <div>
+                  <label id="lbl_dept">Klinik</label>
+                  <input id="p_dept" placeholder="Örn. Kardiyoloji">
+                </div>
+                <div>
+                  <label id="lbl_status">Durum</label>
+                  <select id="p_status">
+                    <option value="hospitalized" id="opt_hosp">Yatıyor</option>
+                    <option value="home" id="opt_home">Evde Takip</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="space"></div>
+              <div class="grid2">
+                <div>
+                  <label id="lbl_hr">Nabız (bpm)</label>
+                  <input id="v_hr" type="number" placeholder="75">
+                </div>
+                <div>
+                  <label id="lbl_spo2">SpO₂ (%)</label>
+                  <input id="v_spo2" type="number" placeholder="97">
+                </div>
+                <div>
+                  <label id="lbl_bp">Sistolik / Diyastolik (mmHg)</label>
+                  <div class="flex">
+                    <input id="v_sys" type="number" placeholder="120">
+                    <input id="v_dia" type="number" placeholder="80">
+                  </div>
+                </div>
+                <div>
+                  <label id="lbl_glu">Kan Şekeri (mg/dL)</label>
+                  <input id="v_glu" type="number" placeholder="110">
+                </div>
+                <div>
+                  <label id="lbl_adh">İlaç Uyumu (%)</label>
+                  <input id="v_adherence" type="number" placeholder="90">
+                </div>
+                <div>
+                  <label id="lbl_los">LOS (gün) — Yatıyorsa</label>
+                  <input id="v_los" type="number" placeholder="2">
+                </div>
+              </div>
+
+              <div class="space"></div>
+              <label id="lbl_symptoms">Semptom</label>
+              <textarea id="v_symptoms" rows="2" placeholder="Örn. nefes darlığı, ateş..."></textarea>
+
+              <div class="space"></div>
+              <div class="flex">
+                <label class="flex" style="gap:8px">
+                  <input id="p_enrolled" type="checkbox"> <span id="lbl_enrolled">Evde Takip Programına Dahil</span>
+                </label>
+                <span class="pill" id="ai_risk_label">AI Risk: <b id="calcRisk">—</b></span>
+              </div>
+
+              <div class="space"></div>
+              <div class="toolbar right">
+                <button class="btn secondary" id="btnCompute">Riski Hesapla</button>
+                <button class="btn" id="btnSave">Kaydet</button>
+              </div>
+
+              <div class="space"></div>
+              <div class="footnote" id="demo_note">Not: Demo ekranıdır; veriler cihazda tutulur (localStorage).</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col card">
+          <div class="section-title" id="registered_title">Kayıtlı Hastalar</div>
+          <div class="toolbar" style="margin-bottom:8px">
+            <input id="search" placeholder="İsim / klinik / hastane ara...">
+            <button class="btn secondary" id="btnRand">Rastgele Simülasyon</button>
+          </div>
+          <div style="overflow:auto;max-height:560px">
+            <table>
+              <thead>
+                <tr>
+                  <th id="th_patient3">Hasta</th>
+                  <th id="th_hospital3">Hastane</th>
+                  <th id="th_dept3">Klinik</th>
+                  <th id="th_risk3">Risk</th>
+                  <th id="th_status3">Durum</th>
+                  <th id="th_action3">İşlem</th>
+                </tr>
+              </thead>
+              <tbody id="patientTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BEDS -->
+    <section id="tab-beds" class="tab" style="display:none">
+      <div class="card">
+        <div class="section-title" id="beds_title">Yatan Hastalar</div>
+        <div class="muted" id="beds_desc" style="margin-bottom:8px">Durum: “Yatıyor” olan tüm hastalar</div>
+        <div style="overflow:auto">
+          <table>
+            <thead>
+              <tr>
+                <th id="th_patient4">Hasta</th>
+                <th id="th_hospital4">Hastane</th>
+                <th id="th_dept4">Klinik</th>
+                <th id="th_los4">LOS (gün)</th>
+                <th id="th_risk4">Risk</th>
+                <th id="th_sugg4">Öneri</th>
+                <th id="th_action4">İşlem</th>
+              </tr>
+            </thead>
+            <tbody id="bedTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="tab-settings" class="tab" style="display:none">
+      <div class="grid2">
+        <div class="card">
+          <div class="section-title" id="risk_thresholds_title">Risk Eşikleri</div>
+          <div class="grid2">
+            <div>
+              <label id="lbl_low">Düşük Risk Üst Sınır (%)</label>
+              <input id="s_low" type="number" placeholder="30">
+            </div>
+            <div>
+              <label id="lbl_high">Yüksek Risk Alt Sınır (%)</label>
+              <input id="s_high" type="number" placeholder="60">
+            </div>
+          </div>
+          <div class="space"></div>
+          <div class="toolbar">
+            <button class="btn" id="btnSaveSettings">Ayarları Kaydet</button>
+            <span class="pill" id="risk_legend">OK: &lt;= düşük • Monitor: arası • Action: &gt;= yüksek</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-title" id="beds_numbers_title">Toplam Yatak Sayıları</div>
+          <div class="grid2">
+            <div>
+              <label id="lbl_ege">Ege Üniversitesi Hastanesi</label>
+              <input id="b_ege" type="number" placeholder="2000">
+            </div>
+            <div>
+              <label id="lbl_deu">Dokuz Eylül Üniversitesi Hastanesi</label>
+              <input id="b_deu" type="number" placeholder="1300">
+            </div>
+            <div>
+              <label id="lbl_yesil">Yeşilyurt Eğitim ve Araştırma Hastanesi</label>
+              <input id="b_yesil" type="number" placeholder="400">
+            </div>
+          </div>
+          <div class="space"></div>
+          <button class="btn secondary" id="btnSaveBeds">Yatak sayılarını kaydet</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- DATA -->
+    <section id="tab-data" class="tab" style="display:none">
+      <div class="card">
+        <div class="section-title" id="data_ops_title">Veri İşlemleri</div>
+        <div class="toolbar">
+          <button class="btn" id="btnSeed">Demo Verisi Yükle</button>
+          <button class="btn secondary" id="btnExport">CSV Dışa Aktar</button>
+          <button class="btn secondary" onclick="window.print()" id="btnPrint">Yazdır / PDF</button>
+          <button class="btn ghost" id="btnClear">Tüm Veriyi Temizle</button>
+        </div>
+        <div class="space"></div>
+        <div class="muted" id="danger_note">Uyarı: “Tüm Veriyi Temizle” cihazınızdaki demo/pilot verilerini siler.</div>
+      </div>
+      <div class="footnote" style="margin-top:8px" id="medical_disclaimer">
+        Tıbbi uyarı: Bu yazılım demo amaçlıdır; klinik karar destek aracı değildir.
+      </div>
+    </section>
+
+    <div class="print-only" style="margin-top:10px">
+      <div class="section-title" id="print_summary">Yazdırma Özeti</div>
+      <div id="print_hint" class="muted">Bu çıktı, mevcut Dashboard verilerinin hızlı özetidir.</div>
+    </div>
+  </div>
+
+  <script>
+    // --- I18N ---
+    const i18n = {
+      tr: {
+        app_title: "SCO Care — İzmir Pilot MVP",
+        subtitle: "Ege Üniversitesi • Dokuz Eylül Üniversitesi • Yeşilyurt EAH — AI tabanlı Evde Bakım + Yatış Optimizasyonu",
+        tab_dashboard_btn: "Dashboard",
+        tab_patient_btn: "Hasta Uygulaması",
+        tab_beds_btn: "Yatak Yönetimi",
+        tab_settings_btn: "Ayarlar",
+        tab_data_btn: "Veri",
+        lang_label: "Dil",
+        kpi_occ_title: "Toplam Yatak Doluluk",
+        kpiOccSub_s: (occ,total)=> `${occ} / ${total} yatak dolu`,
+        kpi_los_title: "Ortalama Yatış Süresi (LOS)",
+        kpi_los_desc: "Güncel yatan hastalar ortalaması",
+        kpi_readmit_title: "Yeniden Yatış Oranı",
+        kpi_readmit_desc: "Son kayıtlar",
+        kpi_home_title: "Evde İzlenen Hasta",
+        kpi_home_desc: "Uzaktan takip (tele-sağlık) aktif",
+        hosp_occ_title: "Hastane Bazlı Doluluk",
+        hosp_occ_desc: "Yatan hasta / toplam yatak",
+        ai_alerts_title: "AI Uyarıları (Yüksek Risk)",
+        ai_alerts_desc: "Risk sınıfı “Action” olan ilk 10",
+        th_patient: "Hasta", th_hospital:"Hastane", th_dept:"Klinik", th_risk:"Risk", th_status:"Durum",
+        discharge_title: "AI Taburculuk Önerileri",
+        discharge_desc: "Düşük risk + 2+ gün yatan hastalar",
+        th_los: "LOS (gün)", th_suggestion: "Öneri",
+        mobile_title: "SCO Care — Hasta", mobile_badge:"Mobil",
+        lbl_name:"Ad Soyad", lbl_hospital:"Hastane", lbl_dept:"Klinik", lbl_status:"Durum",
+        opt_hosp:"Yatıyor", opt_home:"Evde Takip",
+        lbl_hr:"Nabız (bpm)", lbl_spo2:"SpO₂ (%)", lbl_bp:"Sistolik / Diyastolik (mmHg)",
+        lbl_glu:"Kan Şekeri (mg/dL)", lbl_adh:"İlaç Uyumu (%)", lbl_los:"LOS (gün) — Yatıyorsa", lbl_symptoms:"Semptom",
+        lbl_enrolled:"Evde Takip Programına Dahil",
+        btnCompute:"Riski Hesapla", btnSave:"Kaydet",
+        demo_note:"Not: Demo ekranıdır; veriler cihazda tutulur (localStorage).",
+        registered_title:"Kayıtlı Hastalar",
+        search_ph:"İsim / klinik / hastane ara...",
+        btnRand:"Rastgele Simülasyon",
+        beds_title:"Yatan Hastalar",
+        beds_desc:"Durum: “Yatıyor” olan tüm hastalar",
+        risk_thresholds_title:"Risk Eşikleri",
+        lbl_low:"Düşük Risk Üst Sınır (%)",
+        lbl_high:"Yüksek Risk Alt Sınır (%)",
+        btnSaveSettings:"Ayarları Kaydet",
+        risk_legend:"OK: <= düşük • Monitor: arası • Action: >= yüksek",
+        beds_numbers_title:"Toplam Yatak Sayıları",
+        lbl_ege:"Ege Üniversitesi Hastanesi", lbl_deu:"Dokuz Eylül Üniversitesi Hastanesi", lbl_yesil:"Yeşilyurt Eğitim ve Araştırma Hastanesi",
+        btnSaveBeds:"Yatak sayılarını kaydet",
+        data_ops_title:"Veri İşlemleri",
+        btnSeed:"Demo Verisi Yükle",
+        btnExport:"CSV Dışa Aktar",
+        btnPrint:"Yazdır / PDF",
+        btnClear:"Tüm Veriyi Temizle",
+        danger_note:"Uyarı: “Tüm Veriyi Temizle” cihazınızdaki demo/pilot verilerini siler.",
+        medical_disclaimer:"Tıbbi uyarı: Bu yazılım demo amaçlıdır; klinik karar destek aracı değildir.",
+        print_summary:"Yazdırma Özeti",
+        print_hint:"Bu çıktı, mevcut Dashboard verilerinin hızlı özetidir.",
+        no_high_risk:"Yüksek riskli hasta yok.",
+        no_discharge:"Şu an öneri yok.",
+        no_patients:"Hasta bulunamadı.",
+        no_inpatients:"Yatan hasta yok.",
+        edit:"Düzenle", delete:"Sil",
+        discharge_home:"Taburcu & Evde",
+        early_discharge_candidate:"Evde bakım ile erken taburcu uygun olabilir",
+        status_home:"Evde", status_hosp:"Yatıyor",
+        badge_ok:(v)=>`OK ${v}%`, badge_mon:(v)=>`Monitor ${v}%`, badge_act:(v)=>`Action ${v}%`,
+        hosp_bar:(name,cur,tot,pct)=> `<b>${name}</b> <span class="muted">(${cur}/${tot})</span>`,
+        th_patient2:"Hasta", th_hospital2:"Hastane", th_dept2:"Klinik", th_risk2:"Risk",
+        th_patient3:"Hasta", th_hospital3:"Hastane", th_dept3:"Klinik", th_risk3:"Risk", th_status3:"Durum", th_action3:"İşlem",
+        th_patient4:"Hasta", th_hospital4:"Hastane", th_dept4:"Klinik", th_los4:"LOS (gün)", th_risk4:"Risk", th_sugg4:"Öneri", th_action4:"İşlem"
+      },
+      en: {
+        app_title: "SCO Care — Izmir Pilot MVP",
+        subtitle: "Ege University • Dokuz Eylul University • Yesilyurt TRH — AI-enabled Home Care + Admission Optimization",
+        tab_dashboard_btn: "Dashboard",
+        tab_patient_btn: "Patient App",
+        tab_beds_btn: "Bed Management",
+        tab_settings_btn: "Settings",
+        tab_data_btn: "Data",
+        lang_label: "Language",
+        kpi_occ_title: "Total Bed Occupancy",
+        kpiOccSub_s: (occ,total)=> `${occ} / ${total} beds occupied`,
+        kpi_los_title: "Average Length of Stay (LOS)",
+        kpi_los_desc: "Average among current inpatients",
+        kpi_readmit_title: "Readmission Rate (30d proxy)",
+        kpi_readmit_desc: "Based on recent records",
+        kpi_home_title: "Patients Monitored at Home",
+        kpi_home_desc: "Telehealth program active",
+        hosp_occ_title: "Occupancy by Hospital",
+        hosp_occ_desc: "Inpatients / total beds",
+        ai_alerts_title: "AI Alerts (High Risk)",
+        ai_alerts_desc: "Top 10 with “Action” class",
+        th_patient: "Patient", th_hospital:"Hospital", th_dept:"Clinic", th_risk:"Risk", th_status:"Status",
+        discharge_title: "AI Discharge Suggestions",
+        discharge_desc: "Low risk + ≥2 days inpatients",
+        th_los: "LOS (days)", th_suggestion: "Suggestion",
+        mobile_title:"SCO Care — Patient", mobile_badge:"Mobile",
+        lbl_name:"Full Name", lbl_hospital:"Hospital", lbl_dept:"Clinic", lbl_status:"Status",
+        opt_hosp:"Inpatient", opt_home:"Home Monitoring",
+        lbl_hr:"Pulse (bpm)", lbl_spo2:"SpO₂ (%)", lbl_bp:"Systolic / Diastolic (mmHg)",
+        lbl_glu:"Blood Glucose (mg/dL)", lbl_adh:"Medication Adherence (%)", lbl_los:"LOS (days) — If inpatient", lbl_symptoms:"Symptoms",
+        lbl_enrolled:"Enrolled in Home Monitoring",
+        btnCompute:"Compute Risk", btnSave:"Save",
+        demo_note:"Note: Demo screen; data stays on device (localStorage).",
+        registered_title:"Registered Patients",
+        search_ph:"Search name / clinic / hospital...",
+        btnRand:"Random Simulation",
+        beds_title:"Inpatients",
+        beds_desc:"All patients with status “Inpatient”",
+        risk_thresholds_title:"Risk Thresholds",
+        lbl_low:"Low Risk Upper Bound (%)",
+        lbl_high:"High Risk Lower Bound (%)",
+        btnSaveSettings:"Save Settings",
+        risk_legend:"OK: <= low • Monitor: between • Action: >= high",
+        beds_numbers_title:"Total Bed Counts",
+        lbl_ege:"Ege University Hospital", lbl_deu:"Dokuz Eylul University Hospital", lbl_yesil:"Yesilyurt Training and Research Hospital",
+        btnSaveBeds:"Save bed counts",
+        data_ops_title:"Data Operations",
+        btnSeed:"Load Demo Data",
+        btnExport:"Export CSV",
+        btnPrint:"Print / PDF",
+        btnClear:"Clear All Data",
+        danger_note:"Warning: “Clear All Data” removes demo/pilot data on your device.",
+        medical_disclaimer:"Medical notice: Demo only; not a clinical decision tool.",
+        print_summary:"Print Summary",
+        print_hint:"Quick summary of current dashboard metrics.",
+        no_high_risk:"No high-risk patients.",
+        no_discharge:"No suggestions right now.",
+        no_patients:"No patients found.",
+        no_inpatients:"No inpatients.",
+        edit:"Edit", delete:"Delete",
+        discharge_home:"Discharge & Home",
+        early_discharge_candidate:"Eligible for early discharge with home care",
+        status_home:"Home", status_hosp:"Inpatient",
+        badge_ok:(v)=>`OK ${v}%`, badge_mon:(v)=>`Monitor ${v}%`, badge_act:(v)=>`Action ${v}%`,
+        hosp_bar:(name,cur,tot,pct)=> `<b>${name}</b> <span class="muted">(${cur}/${tot})</span>`,
+        th_patient2:"Patient", th_hospital2:"Hospital", th_dept2:"Clinic", th_risk2:"Risk",
+        th_patient3:"Patient", th_hospital3:"Hospital", th_dept3:"Clinic", th_risk3:"Risk", th_status3:"Status", th_action3:"Action",
+        th_patient4:"Patient", th_hospital4:"Hospital", th_dept4:"Clinic", th_los4:"LOS (days)", th_risk4:"Risk", th_sugg4:"Suggestion", th_action4:"Action"
+      }
+    };
+    function t(key){ const L = currentLang(); return i18n[L][key] ?? key; }
+    function currentLang(){ return document.documentElement.getAttribute("data-lang") || "tr"; }
+    function setLang(L){
+      document.documentElement.setAttribute("data-lang", L);
+      const ids = [
+        "app_title","subtitle","tab_dashboard_btn","tab_patient_btn","tab_beds_btn","tab_settings_btn","tab_data_btn",
+        "lang_label","kpi_occ_title","kpi_los_title","kpi_los_desc","kpi_readmit_title","kpi_readmit_desc","kpi_home_title","kpi_home_desc",
+        "hosp_occ_title","hosp_occ_desc","ai_alerts_title","ai_alerts_desc","th_patient","th_hospital","th_dept","th_risk","th_status",
+        "discharge_title","discharge_desc","th_patient2","th_hospital2","th_dept2","th_los","th_risk2","th_suggestion",
+        "mobile_title","mobile_badge","lbl_name","lbl_hospital","lbl_dept","lbl_status","opt_hosp","opt_home",
+        "lbl_hr","lbl_spo2","lbl_bp","lbl_glu","lbl_adh","lbl_los","lbl_symptoms","lbl_enrolled",
+        "registered_title","beds_title","beds_desc","risk_thresholds_title","lbl_low","lbl_high","btnSaveSettings","risk_legend",
+        "beds_numbers_title","lbl_ege","lbl_deu","lbl_yesil","btnSaveBeds","data_ops_title","danger_note",
+        "medical_disclaimer","print_summary","print_hint"
+      ];
+      ids.forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=t(id); });
+      document.getElementById("btnCompute").textContent = t("btnCompute");
+      document.getElementById("btnSave").textContent = t("btnSave");
+      document.getElementById("btnRand").textContent = t("btnRand");
+      document.getElementById("btnSeed").textContent = t("btnSeed");
+      document.getElementById("btnExport").textContent = t("btnExport");
+      document.getElementById("btnPrint").textContent = t("btnPrint");
+      document.getElementById("btnClear").textContent = t("btnClear");
+      document.getElementById("search").placeholder = t("search_ph");
+      renderAll();
+    }
+
+    // --- Routing (hash tabs) ---
+    const tabs = ["dashboard","patient","beds","settings","data"];
+    function showTab(name){
+      document.querySelectorAll(".tab").forEach(s=> s.style.display="none");
+      document.getElementById("tab-"+name).style.display="block";
+      document.querySelectorAll(".tab-link").forEach(a=>a.classList.remove("active"));
+      const btn = document.getElementById("tab_"+name+"_btn"); if(btn) btn.classList.add("active");
+    }
+    function route(){
+      const hash = (location.hash || "#dashboard").replace("#","");
+      const name = tabs.includes(hash) ? hash : "dashboard";
+      showTab(name);
+    }
+    window.addEventListener("hashchange", route);
+
+    // --- Storage & Defaults ---
+    const LS_PATIENTS = "scoPatients";
+    const LS_SETTINGS = "scoSettings";
+    const LS_SEEDED  = "scoSeeded";
+
+    const defaults = {
+      riskLow: 30, riskHigh: 60,
+      beds: {
+        "Ege Üniversitesi Hastanesi": 2000,
+        "Dokuz Eylül Üniversitesi Hastanesi": 1300,
+        "Yeşilyurt Eğitim ve Araştırma Hastanesi": 400
+      }
+    };
+
+    function getSettings(){
+      const s = JSON.parse(localStorage.getItem(LS_SETTINGS) || "null");
+      if(!s){ localStorage.setItem(LS_SETTINGS, JSON.stringify(defaults)); return structuredClone(defaults); }
+      s.beds = s.beds || structuredClone(defaults.beds);
+      s.riskLow = (typeof s.riskLow === "number") ? s.riskLow : defaults.riskLow;
+      s.riskHigh = (typeof s.riskHigh === "number") ? s.riskHigh : defaults.riskHigh;
+      return s;
+    }
+    function saveSettings(s){ localStorage.setItem(LS_SETTINGS, JSON.stringify(s)); }
+    function getPatients(){ return JSON.parse(localStorage.getItem(LS_PATIENTS) || "[]"); }
+    function savePatients(arr){ localStorage.setItem(LS_PATIENTS, JSON.stringify(arr)); }
+
+    // --- Risk Scoring (demo) ---
+    function computeRisk(p, settings){
+      let score = 0; const v = p.vitals || {}; const add = (n)=> score += n;
+      if(v.hr>100) add(20); else if(v.hr>=90) add(10); else if(v.hr<50) add(15);
+      if(v.spo2<90) add(35); else if(v.spo2<=94) add(18);
+      if(v.glucose>=200) add(22); else if(v.glucose>=126) add(15); else if(v.glucose>=100) add(8); else if(v.glucose<70) add(18);
+      if(v.sys>=160 || v.sys<90) add(15); else if(v.sys>=140) add(10);
+      if(v.adherence<60) add(20); else if(v.adherence<80) add(10);
+      const s = (p.symptoms || "").toLowerCase();
+      if(s.includes("nefes") || s.includes("short") || s.includes("breath")) add(18);
+      if(s.includes("ate") || s.includes("fever")) add(10);
+      if(s.includes("chest") || s.includes("göğüs")) add(12);
+      score = Math.max(0, Math.min(100, Math.round(score)));
+      p.riskScore = score;
+      const low = settings.riskLow ?? 30, high = settings.riskHigh ?? 60;
+      p.riskClass = score >= high ? "Action" : (score > low ? "Monitor" : "OK");
+      return p;
+    }
+    function riskBadge(p){
+      const L = currentLang(); const v = p.riskScore ?? "—";
+      if(p.riskClass==="Action") return `<span class="badge act">${i18n[L].badge_act(v)}</span>`;
+      if(p.riskClass==="Monitor") return `<span class="badge mon">${i18n[L].badge_mon(v)}</span>`;
+      return `<span class="badge ok">${i18n[L].badge_ok(v)}</span>`;
+    }
+
+    // --- Rendering ---
+    function localizedHospital(h){
+      const L = currentLang();
+      if(L==="en"){
+        if(h==="Dokuz Eylül Üniversitesi Hastanesi") return "Dokuz Eylul University Hospital";
+        if(h==="Ege Üniversitesi Hastanesi") return "Ege University Hospital";
+        if(h==="Yeşilyurt Eğitim ve Araştırma Hastanesi") return "Yesilyurt Training and Research Hospital";
+      }
+      return h;
+    }
+
+    function renderAll(){
+      const s = getSettings();
+      const pts = getPatients().map(x => computeRisk(x, s));
+
+      const totalBeds = Object.values(s.beds).reduce((a,b)=>a+b,0);
+      const hospPts = pts.filter(p => p.status==="hospitalized");
+      const occ = hospPts.length;
+      const occPct = totalBeds ? Math.round(occ*100/totalBeds) : 0;
+
+      document.getElementById("kpiOcc").textContent = `${occPct}%`;
+      document.getElementById("kpiOccSub").textContent = i18n[currentLang()].kpiOccSub_s(occ,totalBeds);
+
+      const avgLOS = hospPts.length ? (hospPts.reduce((a,b)=>a+(b.losDays||0),0)/hospPts.length) : 0;
+      document.getElementById("kpiLOS").textContent = isFinite(avgLOS) ? `${avgLOS.toFixed(1)}` : "—";
+
+      const readmitRate = pts.length ? Math.round(100 * (pts.filter(p=>p.readmission).length) / pts.length) : 0;
+      document.getElementById("kpiReadmit").textContent = `${readmitRate}%`;
+
+      const homeMonitored = pts.filter(p => p.status==="home" && p.enrolled).length;
+      document.getElementById("kpiHome").textContent = `${homeMonitored}`;
+
+      // Hospital occupancy bars
+      const L = currentLang();
+      const rows = Object.entries(s.beds).map(([hName,total])=>{
+        const cur = pts.filter(p=>p.status==="hospitalized" && p.hospital===hName).length;
+        const pct = total? Math.round(cur*100/total) : 0;
+        const short = (L==="tr")
+          ? (hName.includes("Dokuz Eylül")?"DEÜ":hName.includes("Ege Üniversitesi")?"Ege":hName.includes("Yeşilyurt")?"Yeşilyurt":hName)
+          : (hName.includes("Dokuz Eylül")?"DEU":hName.includes("Ege Üniversitesi")?"Ege":hName.includes("Yeşilyurt")?"Yesilyurt":hName);
+        return `
+          <div class="flex" style="justify-content:space-between;margin:10px 0 4px">
+            <div><b>${short}</b> <span class="muted">(${cur}/${total})</span></div>
+            <div class="pill">${pct}%</div>
+          </div>
+          <div class="bar"><i style="width:${pct}%"></i></div>
+        `;
+      }).join("");
+      document.getElementById("hospBars").innerHTML = rows;
+
+      // Alerts
+      const alerts = pts.filter(p=>p.riskClass==="Action").sort((a,b)=>b.riskScore-a.riskScore).slice(0,10);
+      document.getElementById("alertTable").innerHTML = alerts.map(p=>`
+        <tr>
+          <td>${p.name||"-"}</td>
+          <td>${localizedHospital(p.hospital)}</td>
+          <td>${p.department||"-"}</td>
+          <td>${riskBadge(p)}</td>
+          <td>${p.status==="home"? t("status_home") : t("status_hosp")}</td>
+        </tr>
+      `).join("") || `<tr><td colspan="5" class="muted">${t("no_high_risk")}</td></tr>`;
+
+      // Discharge list
+      const dis = hospPts.filter(p=>p.riskClass==="OK" && (p.losDays||0)>=2).sort((a,b)=>b.losDays-a.losDays);
+      document.getElementById("dischargeTable").innerHTML = dis.map(p=>`
+        <tr>
+          <td>${p.name}</td>
+          <td>${localizedHospital(p.hospital)}</td>
+          <td>${p.department||"-"}</td>
+          <td>${p.losDays||0}</td>
+          <td>${riskBadge(p)}</td>
+          <td>${t("early_discharge_candidate")}</td>
+        </tr>
+      `).join("") || `<tr><td colspan="6" class="muted">${t("no_discharge")}</td></tr>`;
+
+      renderPatientTable(pts);
+
+      const bedRows = hospPts.sort((a,b)=> (b.riskScore||0)-(a.riskScore||0)).map(p=>`
+        <tr>
+          <td>${p.name}</td>
+          <td>${localizedHospital(p.hospital)}</td>
+          <td>${p.department||"-"}</td>
+          <td>${p.losDays||0}</td>
+          <td>${riskBadge(p)}</td>
+          <td>${p.riskClass==="OK" && (p.losDays||0)>=2 ? t("early_discharge_candidate") : "-"}</td>
+          <td><button class="btn secondary" onclick='discharge("${p.id}")'>${t("discharge_home")}</button></td>
+        </tr>
+      `).join("");
+      document.getElementById("bedTable").innerHTML = bedRows || `<tr><td colspan="7" class="muted">${t("no_inpatients")}</td></tr>`;
+    }
+
+    function renderPatientTable(pts){
+      const q = (document.getElementById("search").value || "").toLowerCase();
+      const list = pts.filter(p=>{
+        const blob = `${p.name||""} ${p.hospital||""} ${p.department||""}`.toLowerCase();
+        return !q || blob.includes(q);
+      }).sort((a,b)=> (b.riskScore||0)-(a.riskScore||0));
+
+      document.getElementById("patientTable").innerHTML = list.map(p=>`
+        <tr>
+          <td>${p.name}</td>
+          <td>${localizedHospital(p.hospital)}</td>
+          <td>${p.department||"-"}</td>
+          <td>${riskBadge(p)}</td>
+          <td>${p.status==="home"? t("status_home") : t("status_hosp")} ${p.enrolled?'<span class="pill" style="margin-left:6px">'+t("opt_home")+'</span>':""}</td>
+          <td class="flex">
+            <button class="btn secondary" onclick='prefill("${p.id}")'>${t("edit")}</button>
+            <button class="btn ghost" onclick='removePatient("${p.id}")'>${t("delete")}</button>
+          </td>
+        </tr>
+      `).join("") || `<tr><td colspan="6" class="muted">${t("no_patients")}</td></tr>`;
+    }
+
+    // --- Actions ---
+    function discharge(id){
+      const pts = getPatients();
+      const i = pts.findIndex(p=>p.id===id);
+      if(i>=0){
+        pts[i].status = "home";
+        pts[i].enrolled = true;
+        pts[i].losDays = 0;
+        savePatients(pts);
+        renderAll();
+      }
+    }
+    function removePatient(id){
+      const pts = getPatients().filter(p=>p.id!==id);
+      savePatients(pts); renderAll();
+    }
+    function prefill(id){
+      const p = getPatients().find(x=>x.id===id); if(!p) return;
+      setVal("p_name", p.name||""); setVal("p_hospital", p.hospital||"Ege Üniversitesi Hastanesi"); setVal("p_dept", p.department||"");
+      setVal("p_status", p.status||"hospitalized");
+      setVal("v_hr", p.vitals?.hr ?? ""); setVal("v_spo2", p.vitals?.spo2 ?? ""); setVal("v_sys", p.vitals?.sys ?? "");
+      setVal("v_dia", p.vitals?.dia ?? ""); setVal("v_glu", p.vitals?.glucose ?? ""); setVal("v_adherence", p.vitals?.adherence ?? "");
+      setVal("v_los", p.losDays ?? ""); setVal("v_symptoms", p.symptoms || "", true);
+      document.getElementById("p_enrolled").checked = !!p.enrolled;
+      const s = getSettings(); computeRisk(p, s);
+      document.getElementById("calcRisk").textContent = (p.riskScore??"—") + "%";
+      location.hash = "#patient";
+    }
+    function setVal(id,v,isTextArea=false){ const el=document.getElementById(id); if(!el) return; el.value=v; }
+
+    // --- Seed Data (3 hastane, 30 hasta) ---
+    function seed(){
+      const demo = [
+        // Ege Üniversitesi Hastanesi — Kardiyoloji
+        {
+          id: rid(), name:"Ali Yılmaz", gender:"Erkek", age:68, 
+          hospital:"Ege Üniversitesi Hastanesi", department:"Kardiyoloji",
+          status:"hospitalized", losDays:3, enrolled:false, readmission:false,
+          vitals:{hr:95, spo2:94, sys:140, dia:90, glucose:130, adherence:90},
+          symptoms:"Göğüs ağrısı ve eforla artan nefes darlığı"
+        },
+        // Dokuz Eylül Üniversitesi Hastanesi — Geriatri
+        {
+          id: rid(), name:"Ayşe Demir", gender:"Kadın", age:75, 
+          hospital:"Dokuz Eylül Üniversitesi Hastanesi", department:"Geriatri",
+          status:"home", losDays:0, enrolled:true, readmission:false,
+          vitals:{hr:80, spo2:95, sys:130, dia:80, glucose:100, adherence:70},
+          symptoms:"Unutkanlık, sık idrar yolu enfeksiyonu, hafif düşmeler"
+        },
+        // Yeşilyurt EAH — Göğüs (KOAH Alevlenmesi)
+        {
+          id: rid(), name:"Mehmet Kaya", gender:"Erkek", age:55, 
+          hospital:"Yeşilyurt Eğitim ve Araştırma Hastanesi", department:"Göğüs Hastalıkları",
+          status:"hospitalized", losDays:5, enrolled:false, readmission:true,
+          vitals:{hr:110, spo2:88, sys:135, dia:85, glucose:90, adherence:50},
+          symptoms:"Öksürük, balgam, ateş, gece terlemesi; nefes darlığı"
+        },
+        // Ege Üniversitesi Hastanesi — Dahiliye (Endokrinoloji)
+        {
+          id: rid(), name:"Fatma Yıldız", gender:"Kadın", age:60, 
+          hospital:"Ege Üniversitesi Hastanesi", department:"Dahiliye (Endokrinoloji)",
+          status:"home", losDays:0, enrolled:true, readmission:false,
+          vitals:{hr:85, spo2:97, sys:125, dia:78, glucose:200, adherence:95},
+          symptoms:"Polidipsi, poliüri, yorgunluk"
+        },
+        // Dokuz Eylül Üniversitesi Hastanesi — Kardiyoloji
+        {
+          id: rid(), name:"Ahmet Öztürk", gender:"Erkek", age:72, 
+          hospital:"Dokuz Eylül Üniversitesi Hastanesi", department:"Kardiyoloji",
+          status:"hospitalized", losDays:2, enrolled:false, readmission:false,
+          vitals:{hr:100, spo2:92, sys:150, dia:95, glucose:110, adherence:75},
+          symptoms:"Efor dispnesi, gece öksürükleri, periferik ödem"
+        },
+        // Yeşilyurt EAH — Nöro/Geriatri (İnme sonrası)
+        {
+          id: rid(), name:"Elif Şahin", gender:"Kadın", age:80, 
+          hospital:"Yeşilyurt Eğitim ve Araştırma Hastanesi", department:"Dahiliye (Nöro/Geriatri)",
+          status:"home", losDays:0, enrolled:true, readmission:false,
+          vitals:{hr:70, spo2:96, sys:140, dia:85, glucose:95, adherence:90},
+          symptoms:"Konuşma güçlüğü; evde rehabilitasyon planlanıyor"
+        },
+        // DEÜ — Astım
+        {
+          id: rid(), name:"Selin Kara", gender:"Kadın", age:43, 
+          hospital:"Dokuz Eylül Üniversitesi Hastanesi", department:"Göğüs Hastalıkları (Astım)",
+          status:"home", losDays:0, enrolled:true, readmission:false,
+          vitals:{hr:88, spo2:94, sys:120, dia:78, glucose:98, adherence:80},
+          symptoms:"Hırıltı, eforda nefes darlığı"
+        },
+        // Ege — KY yüksek risk adayı
+        {
+          id: rid(), name:"Hasan Duran", gender:"Erkek", age:67, 
+          hospital:"Ege Üniversitesi Hastanesi", department:"Kardiyoloji",
+          status:"hospitalized", losDays:4, enrolled:false, readmission:true,
+          vitals:{hr:112, spo2:89, sys:165, dia:102, glucose:140, adherence:55},
+          symptoms:"Göğüs ağrısı, nefes darlığı, gece ortopne"
+        },
+        // Ege Üniversitesi — Endokrinoloji
+        {
+          id: rid(), name:"Zeynep Aydın", gender:"Kadın", age:52, 
+          hospital:"Ege Üniversitesi Hastanesi", department:"Endokrinoloji",
+          status:"home", losDays:0, enrolled:true, readmission:false,
+          vitals:{hr:78, spo2:96, sys:135, dia:82, glucose:180, adherence:85},
+          symptoms:"Yorgunluk, kilo kaybı, sık idrara çıkma"
+        },
+        // Yeşilyurt EAH — Nöroloji
+        {
+          id: rid(), name:"Mustafa Çelik", gender:"Erkek", age:70, 
+          hospital:"Yeşilyurt Eğitim ve Araştırma Hastanesi", department:"Nöroloji",
+          status:"hospitalized", losDays:3, enrolled:false, readmission:true,
+          vitals:{hr:92, spo2:93, sys:145, dia:88, glucose:120, adherence:65},
+          symptoms:"Baş dönmesi, kol ve bacakta güçsüzlük, hafif konuşma bozukluğu"
+        },
+        // DEÜ — Göğüs Hastalıkları
+        {
+          id: rid(), name:"Esra Polat", gender:"Kadın", age:48, 
+          hospital:"Dokuz Eylül Üniversitesi Hastanesi", department:"Göğüs Hastalıkları",
+          status:"hospitalized", losDays:2, enrolled:false, readmission:false,
+          vitals:{hr:98, spo2:90, sys:130, dia:80, glucose:105, adherence:70},
+          symptoms:"Hırıltı, öksürük, eforla nefes darlığı"
+        },
+        // Ege Üniversitesi — Kardiyoloji
+        {
+          id: rid(), name:"Hüseyin Koç", gender:"Erkek", age:65, 
+          hospital:"Ege Üniversitesi Hastanesi", department:"Kardiyoloji",
+          status:"hospitalized", losDays:3, enrolled:false, readmission:false,
+          vitals:{hr:88, spo2:95, sys:145, dia:90, glucose:110, adherence:80},
+          symptoms:"Göğüs ağrısı, yorgunluk, hafif ödem"
+        },
+        // DEÜ — Geriatri
+        {
+          id: rid(), name:"Fatma Çetin", gender:"Kadın", age:78, 
+          hospital:"Dokuz Eylül Üniversitesi Hastanesi", department:"Geriatri",
+          status:"home", losDays:0, enrolled:true, readmission:false,
+          vitals:{hr:75, spo2:96, sys:135, dia:85, glucose:140, adherence:85},
+          symptoms:"Unutkanlık, denge problemleri, hafif hipertansiyon"
+        },
+        // Yeşilyurt EAH — Göğüs Hastalıkları
+        {
+          id: rid(), name:"Ahmet Şen", gender:"Erkek", age:62, 
+          hospital:"Yeşilyurt Eğitim ve Araştırma Hastanesi", department:"Göğüs Hastalıkları",
+          status:"hospitalized", losDays:4, enrolled:false, readmission:true,
+          vitals:{hr:105, spo2:89, sys:140, dia:88, glucose:95, adherence:60},
+          symptoms:"Nefes darlığı, öksürük, balgam"
+        },
+        // Ege Üniversitesi — Endokrinoloji
+        {
+          id: rid(), name:"Ayten Gündüz", gender:"Kadın", age:55, 
+          hospital:"Ege Üniversitesi Hastanesi", department:"Endokrinoloji",
+          status:"home", losDays:0, enrolled:true, readmission:false,
+          vitals:{hr:80, spo2:97, sys:130, dia:80, glucose:190, adherence:90},
+          symptoms:"Sık idrara çıkma, yorgunluk, kilo kaybı"
+        },
+        // DEÜ — Kardiyoloji
+        {
+          id: rid(), name:"Murat Aydın", gender:"Erkek", age:70, 
+          hospital:"Dokuz Eylül Üniversitesi Hastanesi", department:"Kardiyoloji",
+          status:"hospitalized", losDays:3, enrolled:false, readmission:false,
+          vitals:{hr:90, spo2:93, sys:155, dia:95, glucose:120, adherence:70},
+          symptoms:"Göğüs ağrısı, efor dispnesi, yorgunluk"
+        },
+        // Yeşilyurt EAH — Nöroloji
+        {
+          id: rid(), name:"Sevim Arslan", gender:"Kadın", age:77, 
+          hospital:"Yeşilyurt Eğitim ve Araştırma Hastanesi", department:"Nöroloji",
+          status:"home", losDays:0, enrolled:true, readmission:false,
+          vitals:{hr:72, spo2:95, sys:140, dia:85, glucose:100, adherence:85},
+          symptoms:"Baş ağrısı, hafif tremor, yürüme zorluğu"
+        },
+        // DEÜ — Göğüs Hastalıkları (Astım)
+        {
+          id: rid(), name:"Cemile Özdemir", gender:"Kadın", age:40, 
+          hospital:"Dokuz Eylül Üniversitesi Hastanesi", department:"Göğüs Hastalıkları (Astım)",
+          status:"home", losDays:0, enrolled:true, readmission:false,
+          vitals:{hr:85, spo2:93, sys:125, dia:80, glucose:90, adherence:75},
+          symptoms:"Hırıltı, gece öksürükleri, eforla nefes darlığı"
+        },
+        // Ege Üniversitesi — Kardiyoloji
+        {
+          id: rid(), name:"İsmail Doğan", gender:"Erkek", age:64, 
+          hospital:"Ege Üniversitesi Hastanesi", department:"Kardiyoloji",
+          status:"hospitalized", losDays:5, enrolled:false, readmission:true,
+          vitals:{hr:115, spo2:88, sys:160, dia:100, glucose:135, adherence:50},
+          symptoms:"Nefes darlığı, göğüs ağrısı, gece ortopne"
+        },
+        // Yeşilyurt EAH — Dahiliye
+        {
+          id: rid(), name:"Zehra Kaplan", gender:"Kadın", age:58, 
+          hospital:"Yeşilyurt Eğitim ve Araştırma Hastanesi", department:"Dahiliye",
+          status:"home", losDays:0, enrolled:true, readmission:false,
+          vitals:{hr:78, spo2:96, sys:130, dia:80, glucose:110, adherence:90},
+          symptoms:"Yorgunluk, eklem ağrıları, hafif ateş"
+        },
+        // Ege Üniversitesi — Endokrinoloji
+        {
+          id: rid(), name:"Emre Soyadı", gender:"Erkek", age:50, 
+          hospital:"Ege Üniversitesi Hastanesi", department:"Endokrinoloji",
+          status:"home", losDays:0, enrolled:true, readmission:false,
+          vitals:{hr:82, spo2:97, sys:135, dia:85, glucose:170, adherence:80},
+          symptoms:"Polidipsi, poliüri, bulanık görme"
+        },
+        // DEÜ — Kardiyoloji
+        {
+          id: rid(), name:"Seda Aksoy", gender:"Kadın", age:66, 
+          hospital:"Dokuz Eylül Üniversitesi Hastanesi", department:"Kardiyoloji",
+          status:"hospitalized", losDays:2, enrolled:false, readmission:false,
+          vitals:{hr:92, spo2:94, sys:145, dia:90, glucose:115, adherence:75},
+          symptoms:"Eforla göğüs ağrısı, yorgunluk"
+        },
+        // Yeşilyurt EAH — Göğüs Hastalıkları
+        {
+          id: rid(), name:"Yusuf Erdem", gender:"Erkek", age:60, 
+          hospital:"Yeşilyurt Eğitim ve Araştırma Hastanesi", department:"Göğüs Hastalıkları",
+          status:"hospitalized", losDays:4, enrolled:false, readmission:true,
+          vitals:{hr:108, spo2:87, sys:140, dia:85, glucose:100, adherence:55},
+          symptoms:"Nefes darlığı, öksürük, balgam, ateş"
+        },
+        // Ege Üniversitesi — Geriatri
+        {
+          id: rid(), name:"Havva Türk", gender:"Kadın", age:82, 
+          hospital:"Ege Üniversitesi Hastanesi", department:"Geriatri",
+          status:"home", losDays:0, enrolled:true, readmission:false,
+          vitals:{hr:70, spo2:95, sys:135, dia:80, glucose:105, adherence:85},
+          symptoms:"Unutkanlık, denge kaybı, hafif hipertansiyon"
+        },
+        // DEÜ — Nöroloji
+        {
+          id: rid(), name:"Kadir Özcan", gender:"Erkek", age:74, 
+          hospital:"Dokuz Eylül Üniversitesi Hastanesi", department:"Nöroloji",
+          status:"hospitalized", losDays:3, enrolled:false, readmission:true,
+          vitals:{hr:90, spo2:92, sys:150, dia:90, glucose:120, adherence:65},
+          symptoms:"Baş dönmesi, konuşma güçlüğü, kol zayıflığı"
+        },
+        // Yeşilyurt EAH — Dahiliye
+        {
+          id: rid(), name:"Gülay Şimşek", gender:"Kadın", age:63, 
+          hospital:"Yeşilyurt Eğitim ve Araştırma Hastanesi", department:"Dahiliye",
+          status:"home", losDays:0, enrolled:true, readmission:false,
+          vitals:{hr:80, spo2:96, sys:130, dia:80, glucose:110, adherence:90},
+          symptoms:"Yorgunluk, karın ağrısı, hafif bulantı"
+        },
+        // Ege Üniversitesi — Kardiyoloji
+        {
+          id: rid(), name:"Ömer Faruk", gender:"Erkek", age:69, 
+          hospital:"Ege Üniversitesi Hastanesi", department:"Kardiyoloji",
+          status:"hospitalized", losDays:3, enrolled:false, readmission:false,
+          vitals:{hr:95, spo2:93, sys:145, dia:90, glucose:115, adherence:80},
+          symptoms:"Göğüs ağrısı, efor dispnesi, yorgunluk"
+        },
+        // DEÜ — Göğüs Hastalıkları
+        {
+          id: rid(), name:"Aylin Kılıç", gender:"Kadın", age:45, 
+          hospital:"Dokuz Eylül Üniversitesi Hastanesi", department:"Göğüs Hastalıkları",
+          status:"home", losDays:0, enrolled:true, readmission:false,
+          vitals:{hr:85, spo2:94, sys:125, dia:80, glucose:95, adherence:80},
+          symptoms:"Hırıltı, eforla nefes darlığı, öksürük"
+        },
+        // Yeşilyurt EAH — Endokrinoloji
+        {
+          id: rid(), name:"Ercan Güler", gender:"Erkek", age:57, 
+          hospital:"Yeşilyurt Eğitim ve Araştırma Hastanesi", department:"Endokrinoloji",
+          status:"home", losDays:0, enrolled:true, readmission:false,
+          vitals:{hr:80, spo2:96, sys:135, dia:85, glucose:185, adherence:85},
+          symptoms:"Yorgunluk, sık idrara çıkma, kilo kaybı"
+        },
+        // Ege Üniversitesi — Nöroloji
+        {
+          id: rid(), name:"Naber Çiftçi", gender:"Kadın", age:71, 
+          hospital:"Ege Üniversitesi Hastanesi", department:"Nöroloji",
+          status:"hospitalized", losDays:3, enrolled:false, readmission:true,
+          vitals:{hr:88, spo2:92, sys:145, dia:90, glucose:120, adherence:70},
+          symptoms:"Baş dönmesi, hafif konuşma bozukluğu, kol zayıflığı"
+        },
+        // DEÜ — Kardiyoloji
+        {
+          id: rid(), name:"Veli Sönmez", gender:"Erkek", age:66, 
+          hospital:"Dokuz Eylül Üniversitesi Hastanesi", department:"Kardiyoloji",
+          status:"hospitalized", losDays:2, enrolled:false, readmission:false,
+          vitals:{hr:90, spo2:94, sys:140, dia:85, glucose:110, adherence:75},
+          symptoms:"Eforla göğüs ağrısı, yorgunluk, hafif ödem"
+        }
+      ];
+      savePatients(demo);
+      const s = getSettings();
+      s.riskLow = 30; s.riskHigh = 60;
+      s.beds = structuredClone(defaults.beds);
+      saveSettings(s);
+      renderAll();
+    }
+
+    // --- CSV Export ---
+    function exportCSV(){
+      const pts = getPatients();
+      const header = ["id","name","gender","age","hospital","department","status","losDays","riskScore","riskClass","enrolled","readmission","hr","spo2","sys","dia","glucose","adherence","symptoms"];
+      const rows = pts.map(p=>{
+        const v=p.vitals||{};
+        return [
+          p.id,p.name,p.gender,p.age,p.hospital,p.department,p.status,p.losDays,p.riskScore,p.riskClass,p.enrolled,p.readmission,
+          v.hr,v.spo2,v.sys,v.dia,v.glucose,v.adherence,(p.symptoms||"").replace(/\n/g," ")
+        ].map(s=> (s===undefined||s===null)?"":String(s));
+      });
+      const csv = [header.join(","), ...rows.map(r=>r.map(x=> /[",\n]/.test(x) ? `"${x.replace(/"/g,'""')}"` : x).join(","))].join("\n");
+      const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = "sco-care-izmir.csv"; a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // --- Helpers ---
+    function rid(){ const a = crypto.getRandomValues(new Uint8Array(12)); return Array.from(a,b=>("0"+b.toString(16)).slice(-2)).join(""); }
+    function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
+    function randRange(a,b){ return Math.round(a + Math.random()*(b-a)); }
+
+    function readForm(){
+      const name = document.getElementById("p_name").value.trim();
+      const hospital = document.getElementById("p_hospital").value;
+      const department = document.getElementById("p_dept").value.trim();
+      const status = document.getElementById("p_status").value;
+      const hr = Number(document.getElementById("v_hr").value);
+      const spo2 = Number(document.getElementById("v_spo2").value);
+      const sys = Number(document.getElementById("v_sys").value);
+      const dia = Number(document.getElementById("v_dia").value);
+      const glucose = Number(document.getElementById("v_glu").value);
+      const adherence = Number(document.getElementById("v_adherence").value);
+      const losDays = Number(document.getElementById("v_los").value || 0);
+      const symptoms = document.getElementById("v_symptoms").value.trim();
+      const enrolled = document.getElementById("p_enrolled").checked;
+      return {
+        id: rid(), name, hospital, department, status,
+        vitals:{hr,spo2,sys,dia,glucose,adherence},
+        losDays, symptoms, enrolled, readmission:false
+      };
+    }
+
+    // --- Events ---
+    document.querySelectorAll(".tab-link").forEach(a=>{
+      a.addEventListener("click", ()=> setTimeout(route,0));
+    });
+
+    document.getElementById("btn_tr").addEventListener("click", ()=>{ 
+      document.getElementById("btn_tr").classList.add("active");
+      document.getElementById("btn_en").classList.remove("active");
+      setLang("tr");
+    });
+    document.getElementById("btn_en").addEventListener("click", ()=>{ 
+      document.getElementById("btn_en").classList.add("active");
+      document.getElementById("btn_tr").classList.remove("active");
+      setLang("en");
+    });
+
+    document.getElementById("btnSeed").addEventListener("click", seed);
+    document.getElementById("btnExport").addEventListener("click", exportCSV);
+    document.getElementById("btnClear").addEventListener("click", ()=>{
+      if(confirm(currentLang()==="tr"?"Tüm veriler silinsin mi?":"Clear all data?")){
+        localStorage.removeItem(LS_PATIENTS);
+        localStorage.removeItem(LS_SETTINGS);
+        localStorage.removeItem(LS_SEEDED);
+        renderAll();
+      }
+    });
+
+    document.getElementById("btnSaveSettings").addEventListener("click", ()=>{
+      const s = getSettings();
+      s.riskLow = Number(document.getElementById("s_low").value || defaults.riskLow);
+      s.riskHigh = Number(document.getElementById("s_high").value || defaults.riskHigh);
+      saveSettings(s); renderAll();
+    });
+    document.getElementById("btnSaveBeds").addEventListener("click", ()=>{
+      const s = getSettings();
+      s.beds = {
+        "Ege Üniversitesi Hastanesi": Number(document.getElementById("b_ege").value || defaults.beds["Ege Üniversitesi Hastanesi"]),
+        "Dokuz Eylül Üniversitesi Hastanesi": Number(document.getElementById("b_deu").value || defaults.beds["Dokuz Eylül Üniversitesi Hastanesi"]),
+        "Yeşilyurt Eğitim ve Araştırma Hastanesi": Number(document.getElementById("b_yesil").value || defaults.beds["Yeşilyurt Eğitim ve Araştırma Hastanesi"]),
+      };
+      saveSettings(s); renderAll();
+    });
+
+    document.getElementById("btnCompute").addEventListener("click", ()=>{
+      const p = readForm(); const s = getSettings(); computeRisk(p, s);
+      document.getElementById("calcRisk").textContent = p.riskScore + "%";
+    });
+
+    document.getElementById("btnSave").addEventListener("click", ()=>{
+      const p = readForm(); if(!p.name){ alert(currentLang()==="tr"?"Lütfen hasta adını girin.":"Please enter patient name."); return; }
+      const s = getSettings(); computeRisk(p, s);
+      const all = getPatients(); all.push(p); savePatients(all); renderAll();
+      alert(currentLang()==="tr"?"Hasta kaydedildi.":"Patient saved.");
+    });
+
+    document.getElementById("search").addEventListener("input", ()=>{
+      renderPatientTable(getPatients().map(x=>computeRisk(x,getSettings())));
+    });
+
+    document.getElementById("btnRand").addEventListener("click", ()=>{
+      const pts = getPatients();
+      if(pts.length===0){ alert(currentLang()==="tr"?"Önce demo verisi yükleyin veya hasta ekleyin.":"Load demo data or add a patient first."); return; }
+      for(let k=0;k<Math.min(3, pts.length);k++){
+        const i = Math.floor(Math.random()*pts.length);
+        const v = pts[i].vitals;
+        v.hr = clamp((v.hr||80) + randRange(-15,20), 40, 160);
+        v.spo2 = clamp((v.spo2||96) + randRange(-4,2), 80, 100);
+        v.sys = clamp((v.sys||120) + randRange(-20,25), 80, 220);
+        v.dia = clamp((v.dia||80) + randRange(-15,10), 50, 130);
+        v.glucose = clamp((v.glucose||120) + randRange(-40,60), 50, 350);
+        v.adherence = clamp((v.adherence||90) + randRange(-20,10), 0, 100);
+      }
+      savePatients(pts); renderAll();
+    });
+
+    // --- Init ---
+    (function init(){
+      setLang("tr");
+      route();
+      // otomatik seed: cihazda veri yoksa
+      if(!localStorage.getItem(LS_SEEDED)){
+        seed();
+        localStorage.setItem(LS_SEEDED, "1");
+      } else {
+        const pts = getPatients();
+        if(!pts || pts.length===0){ seed(); }
+        else { renderAll(); }
+      }
+      // settings UI doldur
+      const s = getSettings();
+      document.getElementById("s_low").value = s.riskLow;
+      document.getElementById("s_high").value = s.riskHigh;
+      document.getElementById("b_ege").value = s.beds["Ege Üniversitesi Hastanesi"];
+      document.getElementById("b_deu").value = s.beds["Dokuz Eylül Üniversitesi Hastanesi"];
+      document.getElementById("b_yesil").value = s.beds["Yeşilyurt Eğitim ve Araştırma Hastanesi"];
+    })();
+  </script>
+</body>
+</html>
